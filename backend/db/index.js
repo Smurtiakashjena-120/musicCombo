@@ -1,6 +1,7 @@
 const mongoose=require("mongoose");
 
-mongoose.connect('mongodb://localhost:27017/Delta');
+// mongoose.connect('mongodb://localhost:27017/Delta');
+mongoose.connect('mongodb+srv://akash:harami309@smurtiakash.spfvdef.mongodb.net/deltaAkash');
 
 const userSchema = new mongoose.Schema({
     username: {
