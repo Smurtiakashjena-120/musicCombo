@@ -1,11 +1,23 @@
+const {User,Artist}=require('./db')
 
+const jwt = require("jsonwebtoken");
+const jwtPassword = "akash309";
 
-const jwt=require("jsonwebtoken");
+async function userMiddleware(req, res, next) {
+   
+  const token = req.headers["authorization"];
+      console.log("token at config",token)
+    const decoded = jwt.verify(token, jwtPassword);
+    console.log("decoded",decoded)
+    const username = decoded.username;
 
-jwtPass="akash";
+    if(decoded){
+      next();
+    }else{
+      res.status(403).json({
+          msg:"user does not exist"
+      })
+    }
+    }
 
-
-
-module.exports={
-    JWT_SECRET: jwtPass
-}
+module.exports = {userMiddleware,jwtPassword};

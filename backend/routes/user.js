@@ -5,13 +5,14 @@ const multer = require('multer');
 const path = require('path');
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const {userMiddleware,jwtPassword} =require("../config");
+const jwt = require("jsonwebtoken");
 
 const hashing = async(password)=>{
 
   const pass= password;
   const hashedPass = await bcrypt.hash(pass,8);
-  console.log(password);
-  console.log(hashedPass)
+
   return hashedPass;
 
 }
@@ -19,8 +20,7 @@ const compareHash = async(password,dbPass)=>{
 
   const pass= password;
   const hashedPass = await bcrypt.hash(pass,8);
-  console.log(password);
-  console.log(hashedPass)
+
   const isMatch = await bcrypt.compare(password, dbPass);
 return isMatch;
 }
@@ -53,10 +53,11 @@ router.post("/signup",async (req,res)=>{
             username: username,
             password: hashedPass
         });
-
+     const token = jwt.sign({username:username},jwtPassword)
         res.status(200).json({
             msg: "User created successfully!!!",
             name: username,
+            token:token
         });
     } catch (error) {
         console.error('Error creating user:', error);
@@ -80,10 +81,11 @@ router.post("/signin",async (req,res)=>{
    }
 
         if(hashedPass){
-           
+           const token = jwt.sign({username:username},jwtPassword);
             res.status(200).json({
                 msg:"signed in sucessfully!!!",
                 name:val.username,
+                token:token
                 
             })
         }
@@ -99,6 +101,7 @@ router.post("/addSong",async (req,res)=>{
     
     const songName=req.body.songName;
     const songLink=req.body.songLink;
+
 
     try {
         const existingUser = await Song.findOne({
@@ -131,7 +134,11 @@ router.post("/addSong",async (req,res)=>{
 
 })
 
-router.get("/getSongs",async(req,res) => {
+router.get("/getSongs",userMiddleware,async(req,res) => {
+
+  const token = req.headers["authorization"];
+  // console.log("token: ",token);
+
     const allSong = await Song.find({});
     res.send(allSong);
 })
@@ -160,7 +167,7 @@ try {
 })
 
 //adding playlist songs
-router.put("/playlist",async (req,res) => {
+router.put("/playlist",userMiddleware,async (req,res) => {
 
 const song =req.body.playlist;
 const username = req.body.username;
@@ -235,7 +242,7 @@ if(cause == "request"){
 }
 });
 
-router.put("/playlistName", async (req,res) => {
+router.put("/playlistName",userMiddleware, async (req,res) => {
 
 const playlistName =req.body.title;
 const username = req.body.username;
@@ -346,7 +353,7 @@ router.put("/privateName", async (req,res) => {
       res.status(500).send('Error updating user');
     }
   });
-  router.put("/privatePlaylist",async (req,res) => {
+  router.put("/privatePlaylist",userMiddleware,async (req,res) => {
 
     const song =req.body.playlist;
     const username = req.body.username;

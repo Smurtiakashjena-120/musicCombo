@@ -21,6 +21,8 @@ const Password = useRef();
         console.log(response.data);
       
         localStorage.setItem("username",Username.current.value)
+        localStorage.setItem("token",response.data.token)
+
         toast.info("sucessfully Logined !!",{
           onClose:()=>{
             navigate('/home')  ;

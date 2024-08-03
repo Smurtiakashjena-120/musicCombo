@@ -19,6 +19,7 @@ export default function Home() {
 
 
   const logined = localStorage.getItem("username")
+  const token = localStorage.getItem("token")
 
 
 
@@ -26,9 +27,14 @@ export default function Home() {
   // Accessing the songs
   async function getSong() {
     try {
-      const response = await axios.get("http://localhost:3000/delta/user/getSongs");
+      const response = await axios.get("http://localhost:3000/delta/user/getSongs",
+        {
+          headers:{"Authorization":token}
+          } ,
+      );
 
-      const val = await axios.post("http://localhost:3000/delta/user/oneUser", {
+      const val = await axios.post("http://localhost:3000/delta/user/oneUser",
+{
         username: logined,
       });
 
@@ -69,7 +75,8 @@ async function addToPrivate({song}){
   try {
 
 
-    let user = await axios.post("http://localhost:3000/delta/user/oneUser", {
+    let user = await axios.post("http://localhost:3000/delta/user/oneUser",
+{
       username: logined,
     });
 let addFlag = false;
@@ -81,7 +88,10 @@ let addFlag = false;
     })
 
 if(!addFlag){
-      const response = await axios.put('http://localhost:3000/delta/user/privatePlaylist', {
+      const response = await axios.put('http://localhost:3000/delta/user/privatePlaylist',
+        {
+          headers:{"Authorization":token}
+          } ,  {
           username: logined,
           playlist: song,
       });
@@ -119,7 +129,10 @@ if(!addFlag){
       if(!user.data.playlist){
         let playlistname = prompt("Give A Name TO Your Playlist");
 
-        let user = await axios.put("http://localhost:3000/delta/user/playlistName", {
+        let user = await axios.put("http://localhost:3000/delta/user/playlistName",
+          {
+            headers:{"Authorization":token}
+            } , {
           username: logined,
           title: playlistname
         });
@@ -127,7 +140,10 @@ if(!addFlag){
         console.log(user.data)
       }
 
-        const response = await axios.put('http://localhost:3000/delta/user/playlist', {
+        const response = await axios.put('http://localhost:3000/delta/user/playlist',
+          {
+            headers:{"Authorization":token}
+            } , {
             username: localStorage.getItem("username"),
             playlist: song,
         });
