@@ -3,7 +3,28 @@ const {User,Song,Artist}=require('../db')
 const router=Router();
 const multer = require('multer');
 const path = require('path');
-const express = require("express")
+const express = require("express");
+const bcrypt = require("bcryptjs");
+
+const hashing = async(password)=>{
+
+  const pass= password;
+  const hashedPass = await bcrypt.hash(pass,8);
+  console.log(password);
+  console.log(hashedPass)
+  return hashedPass;
+
+}
+const compareHash = async(password,dbPass)=>{
+
+  const pass= password;
+  const hashedPass = await bcrypt.hash(pass,8);
+  console.log(password);
+  console.log(hashedPass)
+  const isMatch = await bcrypt.compare(password, dbPass);
+return isMatch;
+}
+
 
 router.get("/getUsers",async(req,res)=>{
 const allUser = await User.find({});
@@ -15,6 +36,7 @@ router.post("/signup",async (req,res)=>{
     
     const username=req.body.username;
     const password=req.body.password;
+    const hashedPass =await hashing(password);
 
     try {
         const existingUser = await User.findOne({
@@ -29,7 +51,7 @@ router.post("/signup",async (req,res)=>{
 
         const user = await User.create({
             username: username,
-            password: password
+            password: hashedPass
         });
 
         res.status(200).json({
@@ -48,12 +70,16 @@ router.post("/signup",async (req,res)=>{
 router.post("/signin",async (req,res)=>{
     const username=req.body.username;
     const password=req.body.password;
-   
-        let val=await User.findOne({
-            username:username,
-            password:password,
-        })
-        if(val){
+    let val=await User.findOne({
+      username:username,
+  })
+    const hashedPass =await compareHash(password,val.password);
+   if(!hashedPass){
+    res.send("password not matched");
+    return;
+   }
+
+        if(hashedPass){
            
             res.status(200).json({
                 msg:"signed in sucessfully!!!",
@@ -237,6 +263,7 @@ router.post("/signupArtist",async (req,res)=>{
     
   const username=req.body.username;
   const password=req.body.password;
+  const hashedPass=await hashing(password);
 
   try {
       const existingUser = await Artist.findOne({
@@ -251,7 +278,7 @@ router.post("/signupArtist",async (req,res)=>{
 
       const user = await Artist.create({
           username: username,
-          password: password
+          password: hashedPass
       });
 
       res.status(200).json({
@@ -270,10 +297,17 @@ router.post("/signupArtist",async (req,res)=>{
 router.post("/signinArtist",async (req,res)=>{
   const username=req.body.username;
   const password=req.body.password;
+  const hashedPass =await compareHash(password);
+  if(!hashedPass){
+   res.send("password not matched");
+   return;
+  }
+
+
  
       let val=await Artist.findOne({
           username:username,
-          password:password,
+          password:hashedPass,
       })
       if(val){
          

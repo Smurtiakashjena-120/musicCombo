@@ -8,11 +8,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
 
-
-  
-
-  
-  
   const [songArray, setSongArray] = useState([]);
   const [user, setUser] = useState([]);
   const [filteredObjects, setFiltered] = useState([]);
@@ -181,7 +176,6 @@ if(!addFlag){
       });
     }
 
-    // Cleanup function to stop the audio when component unmounts or song changes
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
@@ -265,7 +259,6 @@ let songs = referenceSongs.filter(song => song.songName.toLowerCase().includes(v
         </div>
 
         <ShowSongs playSong={playSong} toPlaylist={toPlaylist} songArray={songArray} filteredObjects={filteredObjects} addToPrivate={addToPrivate}/>
- 
 <ToastContainer  position="top-left"/>
     </div>
   );
